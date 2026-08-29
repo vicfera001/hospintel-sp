@@ -1,5 +1,6 @@
 -- HospIntel SP - fonte auxiliar CSV por Oracle External Table
--- Antes de executar, envie ibge_populacao_5_municipios_2022.csv ao OCI Object Storage
+-- Populacoes estimadas pelo IBGE para 1 de julho de 2025.
+-- Antes de executar, envie ibge_populacao_5_municipios_2025.csv ao OCI Object Storage
 -- e substitua <URL_PAR_DO_CSV> pela URL pre-autenticada (PAR) do objeto.
 
 BEGIN
@@ -11,35 +12,36 @@ BEGIN
             'type' VALUE 'csv',
             'skipheaders' VALUE '1',
             'delimiter' VALUE ',',
+            'dateformat' VALUE 'yyyy-mm-dd',
             'rejectlimit' VALUE '0'
         ),
         column_list     => '
-            MUNICIPIO_CODIGO       VARCHAR2(6),
-            IBGE_CODIGO_7          VARCHAR2(7),
-            MUNICIPIO              VARCHAR2(100),
-            POPULACAO_CENSO_2022   NUMBER,
-            UF                     CHAR(2),
-            ANO_REFERENCIA         NUMBER(4),
-            FONTE                  VARCHAR2(50)'
+            MUNICIPIO_CODIGO          VARCHAR2(6),
+            IBGE_CODIGO_7             VARCHAR2(7),
+            MUNICIPIO                 VARCHAR2(100),
+            POPULACAO_ESTIMADA_2025   NUMBER,
+            UF                        CHAR(2),
+            DATA_REFERENCIA           DATE,
+            FONTE                     VARCHAR2(60)'
     );
 END;
 /
 
 CREATE OR REPLACE VIEW VW_PRESSAO_ASSISTENCIAL_POPULACAO AS
 SELECT
-    p.municipio_codigo,
+    p.codigo_municipio,
     p.municipio,
     p.mes_referencia,
     p.internacoes,
     p.leitos_sus,
     p.internacoes_por_leito_sus_mes,
-    e.populacao_censo_2022,
-    ROUND(p.internacoes / NULLIF(e.populacao_censo_2022, 0) * 100000, 2)
+    e.populacao_estimada_2025,
+    ROUND(p.internacoes / NULLIF(e.populacao_estimada_2025, 0) * 100000, 2)
         AS internacoes_por_100_mil_hab
 FROM vw_pressao_assistencial p
 JOIN ext_ibge_populacao e
-  ON e.municipio_codigo = p.municipio_codigo;
+  ON e.municipio_codigo = p.codigo_municipio;
 
--- Validações esperadas: 5 municípios na tabela externa e 60 linhas integradas.
+-- Validacoes esperadas: 5 municipios na tabela externa e 60 linhas integradas.
 SELECT COUNT(*) AS MUNICIPIOS_EXTERNOS FROM EXT_IBGE_POPULACAO;
 SELECT COUNT(*) AS LINHAS_INTEGRADAS FROM VW_PRESSAO_ASSISTENCIAL_POPULACAO;
