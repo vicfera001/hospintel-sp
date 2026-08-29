@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.streamlit/secrets.toml
+*.log
+*.zip
+Wallet_*/
+wallet/
+*.sso
+*.p12
+*.jks
+tnsnames.ora
+sqlnet.ora
+*.pbix.tmp
+data/processed/*_reproduzido.csv
