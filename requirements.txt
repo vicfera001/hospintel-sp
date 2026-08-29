@@ -1,0 +1,7 @@
+# O pipeline de transformação utiliza somente a biblioteca padrão.
+# As dependências abaixo são usadas pelo MVP de linguagem natural.
+pandas>=2.2,<4
+oracledb>=2.5,<4
+plotly>=5.24,<7
+python-dotenv>=1.0,<2
+streamlit>=1.40,<2
