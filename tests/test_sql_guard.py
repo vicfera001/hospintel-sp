@@ -12,6 +12,13 @@ class SqlGuardTests(unittest.TestCase):
         sql = "SELECT * FROM ADMIN.VW_INTERNACOES_MENSAIS m JOIN ADMIN.VW_RANKING_MUNICIPIOS r ON 1=1"
         self.assertEqual(validate_read_only_sql(sql), sql)
 
+    def test_accepts_integrated_pressure_view(self):
+        sql = (
+            "SELECT MUNICIPIO, INTERNACOES_POR_100_MIL_HAB "
+            "FROM ADMIN.VW_PRESSAO_ASSISTENCIAL_POPULACAO"
+        )
+        self.assertEqual(validate_read_only_sql(sql), sql)
+
     def test_accepts_extract_from_date_column(self):
         sql = (
             "SELECT SUM(INTERNACOES) "
@@ -35,4 +42,3 @@ class SqlGuardTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
