@@ -1,5 +1,5 @@
 -- HospIntel SP - CNES/Leitos 2025 em JSON
--- Execute antes de scripts/carregar_cnes_json_oracle.py.
+-- Execute antes de src/carregar_cnes_json_oracle.py.
 
 CREATE TABLE cnes_hospitais_json (
     codigo_cnes  VARCHAR2(7) NOT NULL,
