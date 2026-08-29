@@ -26,3 +26,31 @@ Pergunta no Streamlit
     → validação local de somente leitura
     → execução nas views autorizadas
     → resultado exibido com o SQL utilizado
+
+```
+
+## Publicação no Streamlit Community Cloud
+
+O aplicativo pode ser publicado a partir do repositório GitHub. No ambiente
+hospedado, a wallet Oracle não deve ser adicionada ao repositório. O arquivo ZIP
+da wallet deve ser convertido para Base64 e armazenado exclusivamente nos
+secrets do Streamlit Community Cloud.
+
+Variáveis necessárias no ambiente hospedado:
+
+```text
+APP_MODE=oracle
+ORACLE_USER=HOSPINTELAPP
+ORACLE_PASSWORD=<SENHA_DO_USUARIO_DO_BANCO>
+ORACLE_DSN=fiap_low
+ORACLE_WALLET_PASSWORD=<SENHA_DA_WALLET>
+SELECT_AI_PROFILE=HOSPINTEL_AI
+ORACLE_WALLET_ZIP_B64=<CONTEUDO_BASE64_DO_ZIP_DA_WALLET>
+```
+
+No ambiente hospedado, `ORACLE_CONFIG_DIR` deve permanecer ausente. O aplicativo
+decodifica a wallet em um diretório temporário protegido durante a execução.
+
+Depois da publicação, a URL HTTPS do aplicativo pode ser utilizada em um botão
+do Power BI com a ação **Web URL**, permitindo que o usuário abra a interface de
+consultas em linguagem natural.
