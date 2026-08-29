@@ -1,7 +1,7 @@
--- Execute como ADMIN.
--- Pré-requisito: credencial COHERE_CRED criada no esquema ADMIN.
--- O perfil envia ao provedor somente metadados das três views autorizadas.
--- O bloco CREATE_PROFILE deve ser executado apenas se HOSPINTEL_AI ainda não existir.
+-- Execute como ADMIN depois dos scripts 01 a 07.
+-- Pre-requisito: credencial COHERE_CRED criada no esquema ADMIN.
+-- O bloco CREATE_PROFILE deve ser executado apenas se HOSPINTEL_AI ainda nao existir.
+-- Nenhuma senha, wallet ou URL PAR deve ser gravada neste arquivo.
 
 BEGIN
     DBMS_CLOUD_AI.CREATE_PROFILE(
@@ -12,27 +12,26 @@ BEGIN
             "object_list": [
                 {"owner": "ADMIN", "name": "VW_INTERNACOES_DASHBOARD"},
                 {"owner": "ADMIN", "name": "VW_INTERNACOES_MENSAIS"},
-                {"owner": "ADMIN", "name": "VW_RANKING_MUNICIPIOS"}
+                {"owner": "ADMIN", "name": "VW_RANKING_MUNICIPIOS"},
+                {"owner": "ADMIN", "name": "VW_PRESSAO_ASSISTENCIAL_POPULACAO"}
             ],
             "comments": true,
             "conversation": false
         }',
-        description  => 'NL2SQL do MVP HospIntel SP'
+        description  => 'NL2SQL municipal do HospIntel SP: SIH/SUS, CNES e IBGE 2025'
     );
 END;
 /
 
--- Orientações adicionais para geração consistente de SQL.
 BEGIN
     DBMS_CLOUD_AI.SET_ATTRIBUTE(
         profile_name    => 'HOSPINTEL_AI',
         attribute_name  => 'additional_instructions',
-        attribute_value => 'Os valores da coluna MUNICIPIO estão armazenados em letras maiúsculas e sem acentos. Ao filtrar por município, transforme o nome informado em maiúsculas e remova os acentos do literal. Exemplos: Santo André deve ser SANTO ANDRE; São Paulo deve ser SAO PAULO. Para totais com SUM, use NVL(SUM(...), 0). Quando a pergunta solicitar a categoria, município ou mês associado ao maior ou menor valor, nunca calcule MAX ou MIN separadamente sobre a dimensão e a medida. Ordene pela medida e use FETCH FIRST 1 ROW ONLY para retornar ambos da mesma linha. Para comparar internações de dois meses por município, use VW_INTERNACOES_DASHBOARD, agrupe por CODIGO_MUNICIPIO e MUNICIPIO e calcule cada mês com SUM(CASE WHEN NUMERO_MES = numero_do_mes THEN INTERNACOES ELSE 0 END). O crescimento absoluto é o total do mês final menos o total do mês inicial. A redução deve ser apresentada como valor positivo, calculando o total do mês inicial menos o total do mês final. Para variação percentual, exclua denominadores iguais a zero. Não use LAG sobre VW_RANKING_MUNICIPIOS.'
+        attribute_value => 'Os valores de MUNICIPIO estao em letras maiusculas e sem acentos. Ao filtrar, converta o nome informado para esse padrao. Use NVL(SUM(...), 0) para totais. Para retornar a dimensao associada ao maior ou menor valor, ordene pela medida e use FETCH FIRST 1 ROW ONLY; nao calcule MAX ou MIN separadamente sobre dimensao e medida. Para comparar meses, use NUMERO_MES nas views de internacoes ou MES_REFERENCIA na view integrada. Para crescimento percentual, calcule (valor_final - valor_inicial) / NULLIF(valor_inicial, 0) * 100. VW_PRESSAO_ASSISTENCIAL_POPULACAO contem somente cinco municipios e integra internacoes do SIH/SUS, leitos SUS do CNES e populacao estimada pelo IBGE para 2025. INTERNACOES_POR_LEITO_SUS_MES e um indicador relativo de pressao de demanda e nao representa taxa de ocupacao. INTERNACOES_POR_100_MIL_HAB permite comparacao relativa por populacao. Nao responda perguntas sobre permanencia media, tipos de atendimento, regiao de saude, taxa de ocupacao ou internacoes por hospital, pois esses dados nao estao disponiveis.'
     );
 END;
 /
 
--- Ponte controlada para o usuário restrito do aplicativo.
 CREATE OR REPLACE FUNCTION HOSPINTEL_GENERATE_SQL (
     p_prompt IN VARCHAR2
 ) RETURN CLOB
@@ -48,10 +47,22 @@ END;
 /
 
 GRANT EXECUTE ON HOSPINTEL_GENERATE_SQL TO HOSPINTELAPP;
+GRANT SELECT ON VW_INTERNACOES_DASHBOARD TO HOSPINTELAPP;
+GRANT SELECT ON VW_INTERNACOES_MENSAIS TO HOSPINTELAPP;
+GRANT SELECT ON VW_RANKING_MUNICIPIOS TO HOSPINTELAPP;
+GRANT SELECT ON VW_PRESSAO_ASSISTENCIAL_POPULACAO TO HOSPINTELAPP;
+GRANT READ ON DIRECTORY DATA_PUMP_DIR TO HOSPINTELAPP;
 
--- Teste de geração sem executar o SQL produzido.
+-- Testes de geracao: mostram o SQL sem executa-lo.
 SELECT DBMS_CLOUD_AI.GENERATE(
-    prompt       => 'Quais são os dez municípios com mais internações?',
+    prompt       => 'Em janeiro de 2025, qual municipio teve mais internacoes por leito SUS?',
+    profile_name => 'HOSPINTEL_AI',
+    action       => 'showsql'
+) AS sql_gerado
+FROM dual;
+
+SELECT DBMS_CLOUD_AI.GENERATE(
+    prompt       => 'Compare as internacoes por 100 mil habitantes em janeiro de 2025.',
     profile_name => 'HOSPINTEL_AI',
     action       => 'showsql'
 ) AS sql_gerado
