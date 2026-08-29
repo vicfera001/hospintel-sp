@@ -32,13 +32,22 @@ def main() -> None:
         for documento in documentos
     ]
 
-    conexao = oracledb.connect(
-        user=obrigatoria("ORACLE_USER"),
-        password=obrigatoria("ORACLE_PASSWORD"),
-        dsn=obrigatoria("ORACLE_DSN"),
-        config_dir=os.getenv("ORACLE_CONFIG_DIR"),
-        wallet_password=os.getenv("ORACLE_WALLET_PASSWORD"),
-    )
+    opcoes_conexao = {
+        "user": obrigatoria("ORACLE_USER"),
+        "password": obrigatoria("ORACLE_PASSWORD"),
+        "dsn": obrigatoria("ORACLE_DSN"),
+    }
+    config_dir = os.getenv("ORACLE_CONFIG_DIR")
+    wallet_password = os.getenv("ORACLE_WALLET_PASSWORD")
+    if config_dir:
+        opcoes_conexao.update(
+            config_dir=config_dir,
+            wallet_location=config_dir,
+        )
+    if wallet_password:
+        opcoes_conexao["wallet_password"] = wallet_password
+
+    conexao = oracledb.connect(**opcoes_conexao)
     try:
         with conexao.cursor() as cursor:
             cursor.executemany(
