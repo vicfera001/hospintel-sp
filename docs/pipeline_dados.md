@@ -83,13 +83,7 @@ O Power BI consome as views para análise estruturada. O Streamlit solicita ao O
 2. carga do CSV SIH/SUS processado;
 3. `sql/02_criar_views_powerbi.sql`;
 4. `sql/03_validar_dados.sql`;
-5. `sql/04_configurar_colaboradores.sql`;
-6. `sql/05_preparar_select_ai.sql`;
-7. carga do JSON CNES;
-8. `sql/06_cnes_json_capacidade.sql`;
-9. preparação do objeto e da URL PAR do CSV IBGE;
-10. `sql/07_ibge_populacao_external_table.sql`;
-11. `sql/08_atualizar_select_ai_integracao.sql`.
+5. `sql/04_configurar_colaboradores.sql`;\n6. carga do JSON CNES;\n7. `sql/06_cnes_json_capacidade.sql`;\n8. preparação do objeto e da URL PAR do CSV IBGE;\n9. `sql/07_ibge_populacao_external_table.sql`;\n10. para uma instalação nova, `sql/05_preparar_select_ai.sql`;\n11. para atualizar um perfil já existente, `sql/08_atualizar_select_ai_integracao.sql`.
 
 ## 7. Validações esperadas
 
