@@ -115,13 +115,7 @@ No Oracle, execute os scripts na ordem:
 2. carga de `internacoes_sp_2025_long.csv`;
 3. `02_criar_views_powerbi.sql`;
 4. `03_validar_dados.sql`;
-5. `04_configurar_colaboradores.sql`;
-6. `05_preparar_select_ai.sql`;
-7. carga do JSON CNES com `src/carregar_cnes_json_oracle.py`;
-8. `06_cnes_json_capacidade.sql`;
-9. envio do CSV IBGE ao OCI Object Storage e substituição local de `<URL_PAR_DO_CSV>`;
-10. `07_ibge_populacao_external_table.sql`;
-11. `08_atualizar_select_ai_integracao.sql`.
+5. `04_configurar_colaboradores.sql`;\n6. carga do JSON CNES com `src/carregar_cnes_json_oracle.py`;\n7. `06_cnes_json_capacidade.sql`;\n8. envio do CSV IBGE ao OCI Object Storage e substituição local de `<URL_PAR_DO_CSV>`;\n9. `07_ibge_populacao_external_table.sql`;\n10. para uma instalação nova, `05_preparar_select_ai.sql`;\n11. para atualizar um perfil já existente, `08_atualizar_select_ai_integracao.sql`.
 
 A URL PAR é um segredo operacional e nunca deve ser gravada no GitHub.
 
