@@ -42,9 +42,13 @@ examples = [
     "Qual foi o total de internações em 2025?",
     "Mostre a evolução mensal das internações.",
     "Quais são os 10 municípios com mais internações?",
-    "Em janeiro de 2025, qual município teve mais internações por leito SUS?",
-    "Compare as internações por 100 mil habitantes em janeiro de 2025.",
 ]
+if mode == "Oracle Select AI":
+    examples.extend([
+        "Em janeiro de 2025, qual município teve mais internações por leito SUS?",
+        "Compare as internações por 100 mil habitantes em janeiro de 2025.",
+    ])
+
 question = st.text_input("Faça uma pergunta em português", placeholder=examples[0])
 selected = st.selectbox("Ou escolha um exemplo", ["Selecione..."] + examples)
 if selected != "Selecione...":
